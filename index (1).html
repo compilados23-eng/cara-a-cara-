@@ -1,0 +1,2663 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwNDg0MTcwNTM4NTE4ODE3NTM1MCIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzFjNGIwNGE2NzQ3MjA3YWNfY2FyYS1hLWNhcmEuaHRtbC0zODUifSwiZXhwIjoxNzk1NDU3MTE3LCJpYXQiOjE3OTU0NTM1MTcsImFsZyI6IlJTMjU2In0.ByMUoCu8YmSa68wA6c82odimZ6Iu6VoP-5PQ8WsWNctT6vbD1GLFrvYrLUg_fUFz-i8cnpZ53fuW8bykod0nr1R7nNZuXidbU2TLe-1RNlLf5yGnOtcxKLzwuDCJsOybvet0dgGzMnJHf1vBd-GxKw_C2LICH1THTBSCV6vgvHb23ZtpqaC-wY9IP8N5SqyOsGxlhnrRpM9oEeo6RB3TbgjROLTwylFkNoa_BL1Ah_C-xXqYtTrq0SGGbeBfEM25P6T43_BgOMxbC0WfofmW4dMQjJrZXnbmWrvzi7QbgZ5eBUqsZkv8Xr7mlC6rZQtwM19azgKE5kG9MMDN8K4xVQ","c_1c4b04a6747207ac_cara-a-cara.html-385")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.extensions="";var l=0,t=null,r=null,q=[],F=new TextEncoder,
+G=new TextDecoder;c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*
+16|0;return(f==="x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;
+(g=t)==null||g.postMessage(a)}};Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  const OVERLAY_SELECTOR =
+    'dialog[open], [role="dialog"], [role="alertdialog"], [role="menu"], [role="listbox"], [role="combobox"]';
+
+  function isVisibleOverlay(element) {
+    if (element.closest('[hidden], [aria-hidden="true"], [inert]')) {
+      return false;
+    }
+    if (window.getComputedStyle(element).visibility === 'hidden') {
+      return false;
+    }
+    for (let cur = element; cur; cur = cur.parentElement) {
+      if (window.getComputedStyle(cur).display === 'none') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function hasOpenOverlay() {
+    const candidates = document.querySelectorAll(OVERLAY_SELECTOR);
+    for (let i = 0; i < candidates.length; i++) {
+      if (isVisibleOverlay(candidates[i])) {
+        return true;
+      }
+    }
+    try {
+      if (document.querySelector('[popover]:popover-open')) {
+        return true;
+      }
+    } catch (e) {
+      // Ignore engines that do not support :popover-open.
+    }
+    return false;
+  }
+
+  function isNonEmptySearchInput(target) {
+    return (
+      Boolean(target) &&
+      target.tagName === 'INPUT' &&
+      typeof target.type === 'string' &&
+      target.type.toLowerCase() === 'search' &&
+      typeof target.value === 'string' &&
+      target.value.length > 0
+    );
+  }
+
+  function shouldIgnoreEscape(event) {
+    return (
+      event.key !== 'Escape' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.isComposing ||
+      event.repeat ||
+      event.keyCode === 229 ||
+      isNonEmptySearchInput(event.target)
+    );
+  }
+
+  let shouldIgnoreCaptureState = false;
+
+  window.addEventListener(
+    'keydown',
+    function(event) {
+      if (event.key === 'Escape') {
+        shouldIgnoreCaptureState =
+          hasOpenOverlay() || isNonEmptySearchInput(event.target);
+      }
+    },
+    {capture: true},
+  );
+
+  window.addEventListener('keydown', function(event) {
+    if (
+      shouldIgnoreEscape(event) ||
+      event.defaultPrevented ||
+      shouldIgnoreCaptureState
+    ) {
+      return;
+    }
+    const wasBlockedOnCapture = shouldIgnoreCaptureState;
+    queueMicrotask(function() {
+      if (event.defaultPrevented || wasBlockedOnCapture) {
+        return;
+      }
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({'type': 'escapeKey'}, '*');
+      }
+    });
+  });
+})();</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link id="pwaManifest" rel="manifest" href="blob:https://0gcbcw5gprmobaptj07yyhha5bykwn85uif87mxqhe3lm629k6-h1023759661.scf.usercontent.goog/5ed20e41-6b42-4544-91f2-16e75211fcb3">
+  <title>Cara a Cara Virtual / Guess Who</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" crossorigin="anonymous"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b1120;
+      --card-front: #1e293b;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: #f8fafc;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    /* Fundo estilo arena / tabuleiro moderno */
+    .stadium-bg {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at 85% 90%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
+        linear-gradient(to bottom, #0b1120, #0f172a);
+    }
+
+    /* Perspectiva 3D para o giro das cartas */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+    }
+
+    .card-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 0.85rem;
+      overflow: hidden;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+      border: 2px solid #334155;
+    }
+
+    /* Efeito de destaque no modo Palpite Final */
+    .guess-mode-card:not(.card-flipped) {
+      animation: pulseGuess 1.4s infinite;
+      border-color: #f59e0b !important;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
+    }
+
+    @keyframes pulseGuess {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .animate-pop {
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Scrollbar discreta */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.sticky{position:sticky}.inset-0{inset:0px}.top-0{top:0px}.z-30{z-index:30}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-1\.5{margin-top:0.375rem;margin-bottom:0.375rem}.my-5{margin-top:1.25rem;margin-bottom:1.25rem}.my-auto{margin-top:auto;margin-bottom:auto}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-2\.5{margin-bottom:0.625rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-1\.5{margin-top:0.375rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-12{height:3rem}.h-16{height:4rem}.h-2\.5{height:0.625rem}.h-20{height:5rem}.h-9{height:2.25rem}.max-h-28{max-height:7rem}.max-h-\[540px\]{max-height:540px}.min-h-\[160px\]{min-height:160px}.min-h-screen{min-height:100vh}.w-12{width:3rem}.w-16{width:4rem}.w-2\.5{width:0.625rem}.w-9{width:2.25rem}.w-full{width:100%}.min-w-0{min-width:0px}.max-w-2xl{max-width:42rem}.max-w-6xl{max-width:72rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.max-w-xs{max-width:20rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes ping{75%, 100%{transform:scale(2);opacity:0}}.animate-ping{animation:ping 1s cubic-bezier(0, 0, 0.2, 1) infinite}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-3\.5{gap:0.875rem}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-amber-500{--tw-border-opacity:1;border-color:rgb(245 158 11 / var(--tw-border-opacity, 1))}.border-amber-500\/50{border-color:rgb(245 158 11 / 0.5)}.border-blue-500\/40{border-color:rgb(59 130 246 / 0.4)}.border-emerald-500{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.border-emerald-500\/30{border-color:rgb(16 185 129 / 0.3)}.border-emerald-500\/70{border-color:rgb(16 185 129 / 0.7)}.border-indigo-500\/40{border-color:rgb(99 102 241 / 0.4)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-700\/90{border-color:rgb(51 65 85 / 0.9)}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-slate-800\/80{border-color:rgb(30 41 59 / 0.8)}.border-slate-800\/90{border-color:rgb(30 41 59 / 0.9)}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-blue-500\/20{background-color:rgb(59 130 246 / 0.2)}.bg-blue-600{--tw-bg-opacity:1;background-color:rgb(37 99 235 / var(--tw-bg-opacity, 1))}.bg-blue-950\/50{background-color:rgb(23 37 84 / 0.5)}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-500\/10{background-color:rgb(16 185 129 / 0.1)}.bg-emerald-500\/15{background-color:rgb(16 185 129 / 0.15)}.bg-emerald-500\/20{background-color:rgb(16 185 129 / 0.2)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-green-600{--tw-bg-opacity:1;background-color:rgb(22 163 74 / var(--tw-bg-opacity, 1))}.bg-indigo-500\/20{background-color:rgb(99 102 241 / 0.2)}.bg-indigo-600\/20{background-color:rgb(79 70 229 / 0.2)}.bg-rose-600{--tw-bg-opacity:1;background-color:rgb(225 29 72 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-800\/90{background-color:rgb(30 41 59 / 0.9)}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/75{background-color:rgb(15 23 42 / 0.75)}.bg-slate-900\/90{background-color:rgb(15 23 42 / 0.9)}.bg-slate-900\/95{background-color:rgb(15 23 42 / 0.95)}.bg-slate-950{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.bg-slate-950\/60{background-color:rgb(2 6 23 / 0.6)}.bg-slate-950\/80{background-color:rgb(2 6 23 / 0.8)}.bg-slate-950\/85{background-color:rgb(2 6 23 / 0.85)}.bg-slate-950\/90{background-color:rgb(2 6 23 / 0.9)}.bg-slate-950\/95{background-color:rgb(2 6 23 / 0.95)}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-amber-500{--tw-gradient-from:#f59e0b var(--tw-gradient-from-position);--tw-gradient-to:rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-emerald-500{--tw-gradient-from:#10b981 var(--tw-gradient-from-position);--tw-gradient-to:rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-orange-500{--tw-gradient-to:#f97316 var(--tw-gradient-to-position)}.to-teal-600{--tw-gradient-to:#0d9488 var(--tw-gradient-to-position)}.p-0\.5{padding:0.125rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-2{padding-bottom:0.5rem}.pr-1{padding-right:0.25rem}.pt-1{padding-top:0.25rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-5xl{font-size:3rem;line-height:1}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-none{line-height:1}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-amber-200{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-blue-200{--tw-text-opacity:1;color:rgb(191 219 254 / var(--tw-text-opacity, 1))}.text-blue-300{--tw-text-opacity:1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}.text-blue-400{--tw-text-opacity:1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-indigo-300{--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-950{--tw-text-opacity:1;color:rgb(2 6 23 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.placeholder-slate-500::placeholder{--tw-placeholder-opacity:1;color:rgb(100 116 139 / var(--tw-placeholder-opacity, 1))}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-amber-500\/20{--tw-shadow-color:rgb(245 158 11 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-emerald-500\/20{--tw-shadow-color:rgb(16 185 129 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.backdrop-blur-lg{--tw-backdrop-blur:blur(16px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:border-slate-700:hover{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.hover\:bg-blue-500:hover{--tw-bg-opacity:1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-400:hover{--tw-bg-opacity:1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-green-500:hover{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-600\/30:hover{background-color:rgb(79 70 229 / 0.3)}.hover\:bg-rose-500:hover{--tw-bg-opacity:1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:from-amber-400:hover{--tw-gradient-from:#fbbf24 var(--tw-gradient-from-position);--tw-gradient-to:rgb(251 191 36 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:from-emerald-400:hover{--tw-gradient-from:#34d399 var(--tw-gradient-from-position);--tw-gradient-to:rgb(52 211 153 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-orange-400:hover{--tw-gradient-to:#fb923c var(--tw-gradient-to-position)}.hover\:to-teal-500:hover{--tw-gradient-to:#14b8a6 var(--tw-gradient-to-position)}.hover\:text-emerald-400:hover{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:border-blue-500:focus{--tw-border-opacity:1;border-color:rgb(59 130 246 / var(--tw-border-opacity, 1))}.focus\:border-emerald-500:focus{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.disabled\:pointer-events-none:disabled{pointer-events:none}.disabled\:opacity-35:disabled{opacity:0.35}@media (min-width: 640px){.sm\:w-auto{width:auto}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:justify-start{justify-content:flex-start}.sm\:gap-3{gap:0.75rem}.sm\:p-3\.5{padding:0.875rem}.sm\:p-8{padding:2rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:text-left{text-align:left}.sm\:text-4xl{font-size:2.25rem;line-height:2.5rem}.sm\:text-lg{font-size:1.125rem;line-height:1.75rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}.sm\:text-xs{font-size:0.75rem;line-height:1rem}}@media (min-width: 1024px){.lg\:col-span-4{grid-column:span 4 / span 4}.lg\:col-span-8{grid-column:span 8 / span 8}.lg\:max-h-none{max-height:none}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}}</style></head>
+<body class="stadium-bg min-h-screen flex flex-col">
+
+  <!-- BARRA SUPERIOR / HEADER -->
+  <header class="sticky top-0 z-30 bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-3 py-2.5 sm:px-6">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 text-white font-display font-bold text-lg">
+          ?
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-xl font-bold tracking-tight text-white leading-none">CARA A CARA <span class="text-emerald-400">VIRTUAL</span></h1>
+          <p id="headerSubtitle" class="text-[11px] text-slate-400 font-medium mt-0.5">Edição Futebol &amp; Clássicos</p>
+        </div>
+      </div>
+
+      <!-- Placar & Controles -->
+      <div class="flex items-center gap-1.5 sm:gap-3">
+        <!-- Seletor Bilíngue Instantâneo (PT / EN) -->
+        <div class="flex items-center bg-slate-900 border border-slate-700/90 rounded-xl p-0.5 text-[11px] font-bold" role="group" aria-label="Language Switcher">
+          <button type="button" id="langPtBtn" onclick="window.setLanguage('pt')" class="px-2 py-1 rounded-lg bg-emerald-500 text-slate-950 transition">
+            🇧🇷 PT
+          </button>
+          <button type="button" id="langEnBtn" onclick="window.setLanguage('en')" class="px-2 py-1 rounded-lg text-slate-400 hover:text-white transition">
+            🇺🇸 EN
+          </button>
+        </div>
+
+        <div id="scoreBadge" class="hidden items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold">
+          <span class="text-emerald-400" id="p1ScoreLabel">Você: 0</span>
+          <span class="text-slate-600">|</span>
+          <span class="text-amber-400" id="p2ScoreLabel">Rival: 0</span>
+        </div>
+
+        <button id="downloadHtmlBtn" onclick="window.downloadSelfHTML()" title="Baixar index.html pronto para GitHub/Vercel" class="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition active:scale-95">
+          💾 Baixar
+        </button>
+
+        <button id="soundToggleBtn" onclick="window.toggleSound()" title="Alternar Som / Toggle Sound" class="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-200 transition active:scale-95">
+          <span id="soundIcon">🔊</span>
+        </button>
+
+        <button id="menuReturnBtn" onclick="window.confirmReturnMenu()" class="hidden px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 transition active:scale-95">Início</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 py-4 sm:px-6 flex flex-col">
+
+    <!-- ========================================================= -->
+    <!-- TELA 1: MENU INICIAL E CONFIGURAÇÃO DE PARTIDA            -->
+    <!-- ========================================================= -->
+    <section id="setupScreen" class="my-auto max-w-2xl w-full mx-auto animate-pop">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl">
+        <div class="text-center mb-6">
+          <span id="setupBadge" class="inline-block px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-semibold tracking-wide uppercase mb-2">Jogo de Dedução Multiplayer</span>
+          <h2 id="setupTitle" class="text-2xl sm:text-4xl font-bold text-white">Descubra o Personagem Secreto</h2>
+          <p id="setupDesc" class="text-slate-400 text-sm mt-2">Faça perguntas estratégicas, elimine suspeitos no tabuleiro e acerte antes do seu adversário.</p>
+        </div>
+
+        <!-- Passo 1: Escolha o Tema -->
+        <div class="mb-6">
+          <label id="step1Label" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">1. Escolha o Baralho (12 Cartas)</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button type="button" id="themeSoccerBtn" onclick="window.selectTheme('soccer')" class="theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-left transition active:scale-98">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-2xl shrink-0">⚽</div>
+              <div>
+                <div id="themeSoccerTitle" class="font-display font-bold text-white text-base">Futebol Mundial</div>
+                <div id="themeSoccerSub" class="text-xs text-slate-300 mt-0.5">Craques, barbas, faixas, camisas, capitães e posições.</div>
+              </div>
+            </button>
+
+            <button type="button" id="themeClassicBtn" onclick="window.selectTheme('classic')" class="theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition active:scale-98">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-2xl shrink-0">🎭</div>
+              <div>
+                <div id="themeClassicTitle" class="font-display font-bold text-white text-base">Personagens Clássicos</div>
+                <div id="themeClassicSub" class="text-xs text-slate-400 mt-0.5">Visual variado com óculos, chapéus, bigodes e cores.</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Passo 2: Escolha o Modo de Jogo -->
+        <div class="mb-6">
+          <label id="step2Label" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">2. Modo de Jogo</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button type="button" id="modeCpuBtn" onclick="window.selectMode('cpu')" class="mode-btn p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-left transition">
+              <div class="text-xl mb-1">🤖</div>
+              <div id="modeCpuTitle" class="font-bold text-sm text-white">Solo vs Robô</div>
+              <div id="modeCpuSub" class="text-[11px] text-slate-300 mt-0.5">Teste rápido contra IA inteligente</div>
+            </button>
+
+            <button type="button" id="modePassBtn" onclick="window.selectMode('pass')" class="mode-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition">
+              <div class="text-xl mb-1">📱</div>
+              <div id="modePassTitle" class="font-bold text-sm text-white">Passar Celular</div>
+              <div id="modePassSub" class="text-[11px] text-slate-400 mt-0.5">2 amigos no mesmo aparelho</div>
+            </button>
+
+            <button type="button" id="modeOnlineBtn" onclick="window.selectMode('online')" class="mode-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition">
+              <div class="text-xl mb-1">🌐</div>
+              <div id="modeOnlineTitle" class="font-bold text-sm text-white">Sala Virtual</div>
+              <div id="modeOnlineSub" class="text-[11px] text-slate-400 mt-0.5">Código de sala em 2 celulares</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Painel Extra para Sala Virtual Online -->
+        <div id="onlineRoomPanel" class="hidden mb-6 p-4 rounded-2xl bg-slate-950/90 border border-slate-800 animate-pop">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div>
+              <span id="onlineHeaderTag" class="text-xs font-bold text-blue-400 uppercase tracking-wider">Conexão Virtual Online</span>
+              <p id="onlineHeaderDesc" class="text-xs text-slate-400 mt-0.5">Crie uma sala e envie o link ou código no WhatsApp para seu amigo entrar no celular dele.</p>
+            </div>
+            <button type="button" id="createRoomBtn" onclick="window.createOnlineRoom()" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold whitespace-nowrap transition active:scale-95">+ Gerar Código de Sala</button>
+          </div>
+
+          <div id="createdRoomBox" class="hidden mt-3 pt-3 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <span id="roomCodeCaption" class="text-[11px] text-slate-400 block">Código da sua sala (você é Jogador 1):</span>
+              <span id="generatedRoomCode" class="font-display text-2xl font-bold tracking-widest text-emerald-400">----</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="copyRoomBtn" onclick="window.copyRoomCode()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white">📋 Copiar Link/Código</button>
+              <button type="button" id="whatsappInviteBtn" onclick="window.inviteViaWhatsApp()" class="px-3 py-2 rounded-xl bg-green-600 hover:bg-green-500 text-xs font-bold text-white transition active:scale-95">📲 Convidar WhatsApp</button>
+              <button type="button" id="enterRoomBtn" onclick="window.startGame()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white">Entrar na Sala →</button>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-800 flex gap-2">
+            <input type="text" id="joinRoomInput" maxlength="6" placeholder="Digite o código (ex: GOL123)" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-white uppercase tracking-widest focus:outline-none focus:border-blue-500">
+            <button type="button" id="joinRoomBtn" onclick="window.joinOnlineRoom()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-white transition">Entrar como J2</button>
+          </div>
+          <p id="onlineStatusMsg" class="text-[11px] text-amber-400 mt-2 hidden"></p>
+        </div>
+
+        <!-- Botão Principal Iniciar -->
+        <button id="mainStartBtn" onclick="window.startGame()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-display font-bold text-lg shadow-xl shadow-emerald-500/20 transition transform active:scale-98">COMEÇAR PARTIDA AGORA</button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- TELA 2: TABULEIRO PRINCIPAL DO JOGO                       -->
+    <!-- ========================================================= -->
+    <section id="gameScreen" class="hidden flex-1 flex flex-col gap-3 animate-pop">
+
+      <!-- Barra de Status do Turno & Carta Secreta -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+
+        <!-- Minha Carta Secreta -->
+        <div class="lg:col-span-4 bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex items-center gap-3 shadow-lg">
+          <div id="mySecretAvatar" class="w-16 h-20 rounded-xl bg-slate-800 border-2 border-emerald-500/70 overflow-hidden shrink-0 flex items-center justify-center">
+            <!-- SVG injetado via JS -->
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span id="secretCardBadge" class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase">Sua Carta Secreta</span>
+              <span id="roomTagBadge" class="hidden px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px] font-bold">SALA: ----</span>
+            </div>
+            <h3 id="mySecretName" class="font-display font-bold text-lg text-white truncate mt-1">---</h3>
+            <p id="mySecretTraitsText" class="text-[11px] text-slate-400 line-clamp-2 leading-tight mt-0.5">---</p>
+          </div>
+        </div>
+
+        <!-- Painel Central de Turno e Ações -->
+        <div class="lg:col-span-8 bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+          <div class="text-center sm:text-left">
+            <div class="flex items-center justify-center sm:justify-start gap-2">
+              <span id="turnIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span id="turnLabel" class="font-display font-bold text-base sm:text-lg text-white">Sua vez de perguntar!</span>
+            </div>
+            <p id="turnSubLabel" class="text-xs text-slate-400 mt-0.5">
+              Restam <strong id="remainingCount" class="text-emerald-400">12</strong> suspeitos ativos no seu tabuleiro.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-2 w-full sm:w-auto">
+            <button id="autoFilterBtn" onclick="window.autoFilterLastAnswer()" disabled="" class="px-3 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/30 disabled:opacity-35 disabled:pointer-events-none text-xs font-semibold transition active:scale-95" title="Elimina automaticamente as cartas incompatíveis com a última resposta">✨ Auto-Filtrar</button>
+
+            <button id="finalGuessBtn" onclick="window.toggleFinalGuessMode()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-display font-bold text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition active:scale-95">🎯 Dar Palpite Final</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner de Aviso de Modo Palpite Final -->
+      <div id="finalGuessBanner" class="hidden bg-amber-500/15 border border-amber-500/50 rounded-2xl px-4 py-2.5 flex items-center justify-between gap-2 animate-pop">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-200 font-medium">
+          <span class="text-lg">⚠️</span>
+          <span id="finalGuessBannerText"><strong>MODO PALPITE FINAL:</strong> Clique na carta do personagem que você acha que é o secreto do rival! (Se errar, você perde!)</span>
+        </div>
+        <button id="cancelGuessBtn" onclick="window.toggleFinalGuessMode()" class="px-3 py-1 rounded-lg bg-slate-900 text-xs font-bold text-slate-300 hover:text-white shrink-0">Cancelar</button>
+      </div>
+
+      <!-- ÁREA DIVIDIDA: TABULEIRO (ESQUERDA) + PERGUNTAS & CHAT (DIREITA) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1">
+
+        <!-- GRID DAS 12 CARTAS -->
+        <div class="lg:col-span-8 bg-slate-900/75 border border-slate-800/90 rounded-2xl p-2.5 sm:p-3.5">
+          <div class="flex items-center justify-between mb-2 px-1">
+            <span id="boardHintLabel" class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Toque na carta para virar / eliminar</span>
+            <button id="resetCardsBtn" onclick="window.resetBoardCards()" class="text-[11px] text-slate-400 hover:text-emerald-400 underline">Desvirar todas</button>
+          </div>
+
+          <div id="cardsGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-2.5 sm:gap-3">
+            <!-- 12 Cartas geradas via JS -->
+          </div>
+        </div>
+
+        <!-- PAINEL DE PERGUNTAS RÁPIDAS, RESPOSTAS E HISTÓRICO -->
+        <div class="lg:col-span-4 bg-slate-900/95 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between gap-3 max-h-[540px] lg:max-h-none">
+
+          <!-- Histórico de Perguntas e Respostas -->
+          <div class="flex flex-col flex-1 min-h-[160px]">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+              <span id="chatHeaderTitle" class="text-xs font-bold uppercase tracking-wider text-slate-300">💬 Dedução &amp; Chat</span>
+              <span id="turnCountBadge" class="text-[11px] text-slate-400">Rodada 1</span>
+            </div>
+
+            <div id="chatLog" class="flex-1 overflow-y-auto py-2.5 space-y-2 pr-1 text-xs">
+              <!-- Mensagens inseridas via JS -->
+            </div>
+          </div>
+
+          <!-- Painel de Resposta (Quando o rival pergunta no modo Passar Celular ou Online) -->
+          <div id="answerActionBox" class="hidden p-3 rounded-xl bg-blue-950/50 border border-blue-500/40 animate-pop">
+            <p class="text-xs font-semibold text-blue-200 mb-2" id="incomingQuestionText">O rival perguntou: "..."</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="answerYesBtn" onclick="window.answerOpponentQuestion(true)" class="py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition">✅ SIM</button>
+              <button id="answerNoBtn" onclick="window.answerOpponentQuestion(false)" class="py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition">❌ NÃO</button>
+            </div>
+          </div>
+
+          <!-- Seletor de Perguntas Estratégicas + Campo Livre -->
+          <div id="askControlsBox" class="space-y-2 pt-2 border-t border-slate-800">
+            <label id="quickQuestionsLabel" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Perguntas Rápidas (Clique para enviar):</label>
+            <div id="quickQuestionsList" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1">
+              <!-- Botões de perguntas gerados de acordo com o tema e idioma -->
+            </div>
+
+            <form onsubmit="window.handleCustomQuestion(event)" class="flex gap-1.5 pt-1">
+              <input type="text" id="customQuestionInput" placeholder="Ou escreva sua pergunta..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+              <button type="submit" id="sendCustomBtn" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition active:scale-95">Enviar</button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MODAL DE PRIVACIDADE (MODO PASSAR O CELULAR)              -->
+  <!-- ========================================================= -->
+  <div id="passDeviceModal" class="hidden fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-lg flex items-center justify-center p-4">
+    <div class="max-w-sm w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl animate-pop">
+      <div class="w-16 h-16 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-3xl mx-auto mb-4">
+        📱
+      </div>
+      <h3 id="passModalTitle" class="font-display text-2xl font-bold text-white">Passe o celular para o Jogador 2</h3>
+      <p id="passModalDesc" class="text-sm text-slate-400 mt-2">
+        Não olhe a tela! Entregue o aparelho para o próximo jogador ver sua carta secreta e responder.
+      </p>
+      <button id="passModalConfirmBtn" onclick="window.confirmPassDevice()" class="mt-6 w-full py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-base transition active:scale-95">Sou eu, mostrar minha tela</button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL DE RESULTADO FINAL (VITÓRIA / DERROTA)              -->
+  <!-- ========================================================= -->
+  <div id="resultModal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center shadow-2xl animate-pop">
+      <div id="resultIcon" class="text-5xl mb-3">🏆</div>
+      <h2 id="resultTitle" class="font-display text-3xl font-bold text-white">Você Venceu!</h2>
+      <p id="resultMessage" class="text-sm text-slate-300 mt-2">Você descobriu o personagem secreto!</p>
+
+      <div class="grid grid-cols-2 gap-3 my-5 bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+        <div>
+          <span id="revealMyCaption" class="text-[10px] uppercase tracking-wider text-slate-400 block">Sua Carta Secreta</span>
+          <div id="revealMyCard" class="w-16 h-20 mx-auto my-1.5 rounded-xl overflow-hidden border border-emerald-500"></div>
+          <strong id="revealMyName" class="text-xs text-emerald-400">---</strong>
+        </div>
+        <div>
+          <span id="revealRivalCaption" class="text-[10px] uppercase tracking-wider text-slate-400 block">Carta do Adversário</span>
+          <div id="revealRivalCard" class="w-16 h-20 mx-auto my-1.5 rounded-xl overflow-hidden border border-amber-500"></div>
+          <strong id="revealRivalName" class="text-xs text-amber-400">---</strong>
+        </div>
+      </div>
+
+      <div class="flex gap-2.5">
+        <button id="changeThemeBtn" onclick="window.backToMenu()" class="flex-1 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition">Trocar Tema/Modo</button>
+        <button id="playAgainBtn" onclick="window.playAgain()" class="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-bold text-sm transition">Jogar Novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO PERSONALIZADO (SEM ALERT/CONFIRM) -->
+  <div id="customDialogModal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="max-w-xs w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center shadow-xl animate-pop">
+      <div id="dialogPreviewCard" class="hidden w-16 h-20 mx-auto mb-3 rounded-xl overflow-hidden border-2 border-amber-500 shadow-lg"></div>
+      <h4 id="dialogTitle" class="font-display font-bold text-lg text-white">Sair da partida?</h4>
+      <p id="dialogText" class="text-xs text-slate-400 mt-1.5">O progresso desta rodada será perdido.</p>
+      <div class="flex gap-2 mt-4">
+        <button id="dialogCancelBtn" onclick="window.closeCustomDialog()" class="flex-1 py-2 rounded-xl bg-slate-800 text-xs font-semibold text-slate-300">Cancelar</button>
+        <button id="dialogConfirmBtn" class="flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 text-xs font-bold">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- LÓGICA COMPLETA DO JOGO, GERADOR SVG, IA E MULTIPLAYER     -->
+  <!-- ========================================================= -->
+  <script>
+    // =========================================================================
+    // 1. SISTEMA DE ÁUDIO (Web Audio API - sem arquivos externos)
+    // =========================================================================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'flip') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.09);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        } else if (type === 'ask') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(760, now + 0.12);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        } else if (type === 'yes') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, now);
+          osc.frequency.setValueAtTime(880, now + 0.1);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'no') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(150, now + 0.2);
+          gain.gain.setValueAtTime(0.09, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'win') {
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'triangle';
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.frequency.setValueAtTime(freq, now + i * 0.1);
+            g.gain.setValueAtTime(0.14, now + i * 0.1);
+            g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.35);
+            o.start(now + i * 0.1);
+            o.stop(now + i * 0.1 + 0.35);
+          });
+        } else if (type === 'lose') {
+          [311.13, 277.18, 233.08].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sawtooth';
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.frequency.setValueAtTime(freq, now + i * 0.15);
+            g.gain.setValueAtTime(0.1, now + i * 0.15);
+            g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.15 + 0.3);
+            o.start(now + i * 0.15);
+            o.stop(now + i * 0.15 + 0.3);
+          });
+        }
+      } catch (e) {}
+    }
+
+    window.toggleSound = function () {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundIcon').textContent = soundEnabled ? '🔊' : '🔇';
+    };
+
+    window.downloadSelfHTML = function () {
+      const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    // =========================================================================
+    // 1.5 DICIONÁRIO BILÍNGUE COMPLETO (PT-BR / EN-US) + PWA MANIFEST INLINE
+    // =========================================================================
+    const I18N = {
+      pt: {
+        appTitle: 'CARA A CARA <span class="text-emerald-400">VIRTUAL</span>',
+        headerSub: 'Edição Futebol & Clássicos',
+        menuBtn: 'Início',
+        setupBadge: 'Jogo de Dedução Multiplayer',
+        setupTitle: 'Descubra o Personagem Secreto',
+        setupDesc: 'Faça perguntas estratégicas, elimine suspeitos no tabuleiro e acerte antes do seu adversário.',
+        step1Label: '1. Escolha o Baralho (12 Cartas)',
+        themeSoccerTitle: 'Futebol Mundial',
+        themeSoccerSub: 'Craques, barbas, faixas, camisas, capitães e posições.',
+        themeClassicTitle: 'Personagens Clássicos',
+        themeClassicSub: 'Visual variado com óculos, chapéus, bigodes e cores.',
+        step2Label: '2. Modo de Jogo',
+        modeCpuTitle: 'Solo vs Robô',
+        modeCpuSub: 'Teste rápido contra IA inteligente',
+        modePassTitle: 'Passar Celular',
+        modePassSub: '2 amigos no mesmo aparelho',
+        modeOnlineTitle: 'Sala Virtual',
+        modeOnlineSub: 'Código de sala em 2 celulares',
+        onlineHeaderTag: 'Conexão Virtual Online',
+        onlineHeaderDesc: 'Crie uma sala e envie o link ou código no WhatsApp para seu amigo entrar no celular dele.',
+        createRoomBtn: '+ Gerar Código de Sala',
+        roomCodeCaption: 'Código da sua sala (você é Jogador 1):',
+        copyRoomBtn: '📋 Copiar Link/Código',
+        whatsappInviteBtn: '📲 Convidar WhatsApp',
+        enterRoomBtn: 'Entrar na Sala →',
+        joinRoomPlaceholder: 'Digite o código (ex: GOL123)',
+        joinRoomBtn: 'Entrar como J2',
+        invalidRoomCode: 'Digite um código de sala válido.',
+        copiedCodeMsg: (code) => `Link e código ${code} copiados! Envie para seu amigo entrar como Jogador 2.`,
+        whatsappText: (code, url) => `Bora jogar Cara a Cara Virtual comigo! Clique no link (Sala ${code}): ${url}`,
+        mainStartBtn: 'COMEÇAR PARTIDA AGORA',
+        secretCardBadge: 'Sua Carta Secreta',
+        roomTag: (code, role) => `SALA: ${code} (J${role})`,
+        yourTurn: 'Sua vez de perguntar!',
+        playerTurn: (p) => `Vez do Jogador ${p}`,
+        cpuThinking: 'Robô IA pensando...',
+        waitingRival: 'Aguardando adversário...',
+        remainingSuspects: (n) => `Restam <strong id="remainingCount" class="text-emerald-400">${n}</strong> suspeitos ativos no seu tabuleiro.`,
+        autoFilterBtn: '✨ Auto-Filtrar',
+        finalGuessBtn: '🎯 Dar Palpite Final',
+        finalGuessBanner: '<strong>MODO PALPITE FINAL:</strong> Clique na carta do personagem que você acha que é o secreto do rival! (Se errar, você perde!)',
+        cancelBtn: 'Cancelar',
+        boardHint: 'Toque na carta para virar / eliminar',
+        resetCardsBtn: 'Desvirar todas',
+        chatHeader: '💬 Dedução & Chat',
+        roundBadge: (r) => `Rodada ${r}`,
+        yesBtn: '✅ SIM',
+        noBtn: '❌ NÃO',
+        yesText: '✅ SIM!',
+        noText: '❌ NÃO!',
+        quickQuestionsLabel: 'Perguntas Rápidas (Clique para enviar):',
+        customQuestionPlaceholder: 'Ou escreva sua pergunta...',
+        sendBtn: 'Enviar',
+        passModalConfirm: 'Sou eu, mostrar minha tela',
+        passP1Title: 'Jogador 1: Sua Vez!',
+        passP1Desc: 'Certifique-se de que o Jogador 2 não está olhando para a tela.',
+        passTurnTitle: (p) => `Vez do Jogador ${p}`,
+        passTurnDesc: (prev) => `O Jogador ${prev} fez uma pergunta. Veja sua carta e responda SIM ou NÃO!`,
+        incomingQuestion: (q) => `Pergunta recebida: "${q}"`,
+        winTitle: 'Vitória Épica!',
+        loseTitle: 'Não foi dessa vez!',
+        revealMyCaption: 'Sua Carta Secreta',
+        revealRivalCaption: 'Carta do Adversário',
+        changeThemeBtn: 'Trocar Tema/Modo',
+        playAgainBtn: 'Jogar Novamente',
+        exitDialogTitle: 'Voltar ao menu inicial?',
+        exitDialogText: 'A partida atual será encerrada.',
+        guessConfirmTitle: (name) => `Arriscar ${name}?`,
+        guessConfirmText: 'Se você acertar, vence na hora! Se errar, o adversário ganha a partida.',
+        confirmBtn: 'Confirmar',
+        youScore: (s) => `Você: ${s}`,
+        rivalScore: (s) => `Rival: ${s}`,
+        p1Score: (s) => `J1: ${s}`,
+        p2Score: (s) => `J2: ${s}`,
+        youLabel: 'Você',
+        playerLabel: (p) => `Jogador ${p}`,
+        rivalLabel: 'Adversário',
+        cpuLabel: 'Robô IA',
+        youAutoLabel: 'Você (Auto)',
+        systemLabel: 'Sistema',
+        sysCpuStart: 'Partida iniciada contra o Robô IA! Escolha uma pergunta abaixo para começar.',
+        sysRoomCreated: (code) => `Sala ${code} criada! Envie o link pelo WhatsApp ou aguarde o Jogador 2 entrar.`,
+        sysP2Joined: '🟢 Jogador 2 entrou na sala virtual!',
+        sysConnectedWait: '🟢 Conectado à sala! Aguardando Jogador 1 fazer a primeira pergunta...',
+        sysAutoFiltered: (n) => `✨ Auto-Filtro eliminou ${n} carta(s) incompatível(is).`,
+        cpuTurnAsk: (q) => `Minha vez: ${q}`,
+        guessCorrect: (name) => `Você arriscou ${name} e acertou em cheio!`,
+        guessWrong: (name, actual) => `Você arriscou ${name}, mas a carta secreta era ${actual}!`,
+        cpuGuessWin: (name) => `O Robô IA deu o palpite final e acertou: ${name}!`,
+        cpuGuessLose: (name) => `O Robô IA arriscou ${name} e errou! Vitória sua!`,
+        remoteGuessWin: (role, name) => `Jogador ${role} acertou o palpite final (${name})!`,
+        remoteGuessLose: (role, name) => `Jogador ${role} arriscou ${name} e errou!`,
+        traits: {
+          Atacante: 'Forward',
+          Meia: 'Midfielder',
+          Zagueiro: 'Defender',
+          Goleiro: 'Goalkeeper',
+          Brasil: 'Brazil',
+          Internacional: 'International',
+          Barba: 'Beard',
+          Faixa: 'Headband',
+          Capitão: 'Captain',
+          Óculos: 'Glasses',
+          Mulher: 'Female',
+          Homem: 'Male',
+          Chapéu: 'Hat',
+          Bigode: 'Mustache'
+        },
+        roleShort: { Atacante: 'ATA', Meia: 'MEI', Zagueiro: 'ZAG', Goleiro: 'GOL' },
+        roleShortEn: { Atacante: 'FWD', Meia: 'MID', Zagueiro: 'DEF', Goleiro: 'GK' }
+      },
+      en: {
+        appTitle: 'GUESS WHO <span class="text-emerald-400">VIRTUAL</span>',
+        headerSub: 'World Soccer & Classics Edition',
+        menuBtn: 'Home',
+        setupBadge: 'Multiplayer Deduction Game',
+        setupTitle: 'Guess the Secret Character',
+        setupDesc: 'Ask strategic questions, flip down suspects on the board, and guess before your opponent.',
+        step1Label: '1. Choose Your Deck (12 Cards)',
+        themeSoccerTitle: 'World Soccer Stars',
+        themeSoccerSub: 'Stars, beards, headbands, jerseys, captains & positions.',
+        themeClassicTitle: 'Classic Characters',
+        themeClassicSub: 'Expressive faces with glasses, hats, mustaches & colors.',
+        step2Label: '2. Game Mode',
+        modeCpuTitle: 'Solo vs AI Bot',
+        modeCpuSub: 'Quick match against smart AI',
+        modePassTitle: 'Pass & Play',
+        modePassSub: '2 players on the same device',
+        modeOnlineTitle: 'Virtual Room',
+        modeOnlineSub: 'Room code across 2 devices',
+        onlineHeaderTag: 'Online Virtual Connection',
+        onlineHeaderDesc: 'Create a room and share the WhatsApp link or code with a friend to join on their phone.',
+        createRoomBtn: '+ Generate Room Code',
+        roomCodeCaption: 'Your room code (you are Player 1):',
+        copyRoomBtn: '📋 Copy Link/Code',
+        whatsappInviteBtn: '📲 Invite via WhatsApp',
+        enterRoomBtn: 'Enter Room →',
+        joinRoomPlaceholder: 'Enter code (e.g. GOL123)',
+        joinRoomBtn: 'Join as P2',
+        invalidRoomCode: 'Please enter a valid room code.',
+        copiedCodeMsg: (code) => `Link & code ${code} copied! Send it to your friend to join as Player 2.`,
+        whatsappText: (code, url) => `Play Virtual Guess Who with me! Tap to join Room ${code}: ${url}`,
+        mainStartBtn: 'START MATCH NOW',
+        secretCardBadge: 'Your Secret Card',
+        roomTag: (code, role) => `ROOM: ${code} (P${role})`,
+        yourTurn: 'Your turn to ask!',
+        playerTurn: (p) => `Player ${p}'s Turn`,
+        cpuThinking: 'AI Bot is thinking...',
+        waitingRival: 'Waiting for opponent...',
+        remainingSuspects: (n) => `<strong id="remainingCount" class="text-emerald-400">${n}</strong> active suspects remaining on your board.`,
+        autoFilterBtn: '✨ Auto-Filter',
+        finalGuessBtn: '🎯 Make Final Guess',
+        finalGuessBanner: '<strong>FINAL GUESS MODE:</strong> Click the character card you think is your opponent’s secret! (Wrong guess = instant loss!)',
+        cancelBtn: 'Cancel',
+        boardHint: 'Tap a card to flip / eliminate',
+        resetCardsBtn: 'Flip all back',
+        chatHeader: '💬 Deduction & Chat',
+        roundBadge: (r) => `Round ${r}`,
+        yesBtn: '✅ YES',
+        noBtn: '❌ NO',
+        yesText: '✅ YES!',
+        noText: '❌ NO!',
+        quickQuestionsLabel: 'Quick Questions (Tap to send):',
+        customQuestionPlaceholder: 'Or type your own question...',
+        sendBtn: 'Send',
+        passModalConfirm: "It's me, show my screen",
+        passP1Title: 'Player 1: Your Turn!',
+        passP1Desc: 'Make sure Player 2 is not looking at the screen.',
+        passTurnTitle: (p) => `Player ${p}'s Turn`,
+        passTurnDesc: (prev) => `Player ${prev} asked a question. Check your secret card and answer YES or NO!`,
+        incomingQuestion: (q) => `Question received: "${q}"`,
+        winTitle: 'Epic Victory!',
+        loseTitle: 'Not This Time!',
+        revealMyCaption: 'Your Secret Card',
+        revealRivalCaption: "Opponent's Card",
+        changeThemeBtn: 'Change Deck/Mode',
+        playAgainBtn: 'Play Again',
+        exitDialogTitle: 'Return to main menu?',
+        exitDialogText: 'Current match progress will be lost.',
+        guessConfirmTitle: (name) => `Guess ${name}?`,
+        guessConfirmText: 'If you are right, you win immediately! If wrong, your opponent wins.',
+        confirmBtn: 'Confirm',
+        youScore: (s) => `You: ${s}`,
+        rivalScore: (s) => `Rival: ${s}`,
+        p1Score: (s) => `P1: ${s}`,
+        p2Score: (s) => `P2: ${s}`,
+        youLabel: 'You',
+        playerLabel: (p) => `Player ${p}`,
+        rivalLabel: 'Opponent',
+        cpuLabel: 'AI Bot',
+        youAutoLabel: 'You (Auto)',
+        systemLabel: 'System',
+        sysCpuStart: 'Match started against AI Bot! Pick a question below to begin.',
+        sysRoomCreated: (code) => `Room ${code} created! Share the WhatsApp link or wait for Player 2.`,
+        sysP2Joined: '🟢 Player 2 joined the virtual room!',
+        sysConnectedWait: '🟢 Connected to room! Waiting for Player 1 to ask the first question...',
+        sysAutoFiltered: (n) => `✨ Auto-Filter eliminated ${n} incompatible card(s).`,
+        cpuTurnAsk: (q) => `My turn: ${q}`,
+        guessCorrect: (name) => `You guessed ${name} and nailed it!`,
+        guessWrong: (name, actual) => `You guessed ${name}, but the secret character was ${actual}!`,
+        cpuGuessWin: (name) => `AI Bot made a final guess and nailed it: ${name}!`,
+        cpuGuessLose: (name) => `AI Bot guessed ${name} and missed! You win!`,
+        remoteGuessWin: (role, name) => `Player ${role} guessed right (${name})!`,
+        remoteGuessLose: (role, name) => `Player ${role} guessed ${name} and missed!`,
+        traits: {
+          Atacante: 'Forward',
+          Meia: 'Midfielder',
+          Zagueiro: 'Defender',
+          Goleiro: 'Goalkeeper',
+          Brasil: 'Brazil',
+          Internacional: 'International',
+          Barba: 'Beard',
+          Faixa: 'Headband',
+          Capitão: 'Captain',
+          Óculos: 'Glasses',
+          Mulher: 'Female',
+          Homem: 'Male',
+          Chapéu: 'Hat',
+          Bigode: 'Mustache'
+        },
+        roleShort: { Atacante: 'ATA', Meia: 'MEI', Zagueiro: 'ZAG', Goleiro: 'GOL' },
+        roleShortEn: { Atacante: 'FWD', Meia: 'MID', Zagueiro: 'DEF', Goleiro: 'GK' }
+      }
+    };
+
+    let currentLang = (navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'pt';
+
+    function t(key, ...args) {
+      const entry = I18N[currentLang][key];
+      return typeof entry === 'function' ? entry(...args) : entry;
+    }
+
+    function setupInlinePWAManifest() {
+      try {
+        const manifest = {
+          name: 'Cara a Cara Virtual / Guess Who',
+          short_name: 'Cara a Cara',
+          start_url: '.',
+          display: 'standalone',
+          background_color: '#0b1120',
+          theme_color: '#0f172a',
+          icons: [
+            {
+              src: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%2310b981%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22white%22>?</text></svg>',
+              sizes: '192x192',
+              type: 'image/svg+xml'
+            }
+          ]
+        };
+        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+        document.getElementById('pwaManifest').href = URL.createObjectURL(blob);
+      } catch (e) {}
+    }
+
+    window.setLanguage = function (lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang === 'en' ? 'en-US' : 'pt-BR';
+
+      document.getElementById('langPtBtn').className = lang === 'pt'
+        ? 'px-2 py-1 rounded-lg bg-emerald-500 text-slate-950 transition'
+        : 'px-2 py-1 rounded-lg text-slate-400 hover:text-white transition';
+      document.getElementById('langEnBtn').className = lang === 'en'
+        ? 'px-2 py-1 rounded-lg bg-emerald-500 text-slate-950 transition'
+        : 'px-2 py-1 rounded-lg text-slate-400 hover:text-white transition';
+
+      document.querySelector('header h1').innerHTML = t('appTitle');
+      document.getElementById('headerSubtitle').textContent = t('headerSub');
+      document.getElementById('menuReturnBtn').textContent = t('menuBtn');
+      document.getElementById('setupBadge').textContent = t('setupBadge');
+      document.getElementById('setupTitle').textContent = t('setupTitle');
+      document.getElementById('setupDesc').textContent = t('setupDesc');
+      document.getElementById('step1Label').textContent = t('step1Label');
+      document.getElementById('themeSoccerTitle').textContent = t('themeSoccerTitle');
+      document.getElementById('themeSoccerSub').textContent = t('themeSoccerSub');
+      document.getElementById('themeClassicTitle').textContent = t('themeClassicTitle');
+      document.getElementById('themeClassicSub').textContent = t('themeClassicSub');
+      document.getElementById('step2Label').textContent = t('step2Label');
+      document.getElementById('modeCpuTitle').textContent = t('modeCpuTitle');
+      document.getElementById('modeCpuSub').textContent = t('modeCpuSub');
+      document.getElementById('modePassTitle').textContent = t('modePassTitle');
+      document.getElementById('modePassSub').textContent = t('modePassSub');
+      document.getElementById('modeOnlineTitle').textContent = t('modeOnlineTitle');
+      document.getElementById('modeOnlineSub').textContent = t('modeOnlineSub');
+      document.getElementById('onlineHeaderTag').textContent = t('onlineHeaderTag');
+      document.getElementById('onlineHeaderDesc').textContent = t('onlineHeaderDesc');
+      document.getElementById('createRoomBtn').textContent = t('createRoomBtn');
+      document.getElementById('roomCodeCaption').textContent = t('roomCodeCaption');
+      document.getElementById('copyRoomBtn').textContent = t('copyRoomBtn');
+      document.getElementById('whatsappInviteBtn').textContent = t('whatsappInviteBtn');
+      document.getElementById('enterRoomBtn').textContent = t('enterRoomBtn');
+      document.getElementById('joinRoomInput').placeholder = t('joinRoomPlaceholder');
+      document.getElementById('joinRoomBtn').textContent = t('joinRoomBtn');
+      document.getElementById('mainStartBtn').textContent = t('mainStartBtn');
+
+      document.getElementById('secretCardBadge').textContent = t('secretCardBadge');
+      document.getElementById('autoFilterBtn').textContent = t('autoFilterBtn');
+      document.getElementById('finalGuessBtn').textContent = t('finalGuessBtn');
+      document.getElementById('finalGuessBannerText').innerHTML = t('finalGuessBanner');
+      document.getElementById('cancelGuessBtn').textContent = t('cancelBtn');
+      document.getElementById('boardHintLabel').textContent = t('boardHint');
+      document.getElementById('resetCardsBtn').textContent = t('resetCardsBtn');
+      document.getElementById('chatHeaderTitle').textContent = t('chatHeader');
+      document.getElementById('answerYesBtn').textContent = t('yesBtn');
+      document.getElementById('answerNoBtn').textContent = t('noBtn');
+      document.getElementById('quickQuestionsLabel').textContent = t('quickQuestionsLabel');
+      document.getElementById('customQuestionInput').placeholder = t('customQuestionPlaceholder');
+      document.getElementById('sendCustomBtn').textContent = t('sendBtn');
+      document.getElementById('passModalConfirmBtn').textContent = t('passModalConfirm');
+      document.getElementById('revealMyCaption').textContent = t('revealMyCaption');
+      document.getElementById('revealRivalCaption').textContent = t('revealRivalCaption');
+      document.getElementById('changeThemeBtn').textContent = t('changeThemeBtn');
+      document.getElementById('playAgainBtn').textContent = t('playAgainBtn');
+      document.getElementById('dialogCancelBtn').textContent = t('cancelBtn');
+      document.getElementById('dialogConfirmBtn').textContent = t('confirmBtn');
+
+      if (!document.getElementById('gameScreen').classList.contains('hidden')) {
+        if (state.mode === 'online' && state.roomCode) {
+          document.getElementById('roomTagBadge').textContent = t('roomTag', state.roomCode, state.playerRole);
+        }
+        renderSecretCard();
+        renderBoard();
+        renderQuickQuestions();
+        updateTurnUI();
+        updateScoreDisplay();
+      }
+    };
+
+    // =========================================================================
+    // 2. BARALHOS COMPLETOS (FUTEBOL MUNDIAL & CLÁSSICOS)
+    // =========================================================================
+    const DECKS = {
+      soccer: {
+        characters: [
+          { id: 's1', name: 'Lucas Camisa 10', nameEn: 'Lucas #10', role: 'Atacante', brazilian: true, skin: '#d99b66', hairColor: '#1e1b18', hairStyle: 'curly', beard: true, headband: false, captain: true, glasses: false, jersey: '#facc15', trim: '#16a34a' },
+          { id: 's2', name: 'Mateus Velocista', nameEn: 'Mateus Speedster', role: 'Atacante', brazilian: true, skin: '#8d5524', hairColor: '#f8fafc', hairStyle: 'short', beard: false, headband: true, captain: false, glasses: false, jersey: '#facc15', trim: '#16a34a' },
+          { id: 's3', name: 'Leo Maestro', nameEn: 'Leo Maestro', role: 'Meia', brazilian: false, skin: '#f1c27d', hairColor: '#4a3728', hairStyle: 'short', beard: true, headband: false, captain: true, glasses: false, jersey: '#38bdf8', trim: '#ffffff' },
+          { id: 's4', name: 'Kylian Raio', nameEn: 'Kylian Flash', role: 'Atacante', brazilian: false, skin: '#6f4e37', hairColor: '#111827', hairStyle: 'bald', beard: false, headband: false, captain: false, glasses: false, jersey: '#2563eb', trim: '#dc2626' },
+          { id: 's5', name: 'Erling Muralha', nameEn: 'Erling Titan', role: 'Atacante', brazilian: false, skin: '#ffdbac', hairColor: '#eab308', hairStyle: 'long', beard: false, headband: true, captain: false, glasses: false, jersey: '#dc2626', trim: '#1d4ed8' },
+          { id: 's6', name: 'Alisson Paredão', nameEn: 'Alisson Wall', role: 'Goleiro', brazilian: true, skin: '#e0ac69', hairColor: '#5c4033', hairStyle: 'short', beard: true, headband: false, captain: false, glasses: false, jersey: '#16a34a', trim: '#0f172a' },
+          { id: 's7', name: 'Marta Rainha', nameEn: 'Marta Queen', role: 'Meia', brazilian: true, skin: '#a46941', hairColor: '#1e1b18', hairStyle: 'long', beard: false, headband: true, captain: true, glasses: false, jersey: '#facc15', trim: '#16a34a' },
+          { id: 's8', name: 'Davi Xerife', nameEn: 'Davi Sheriff', role: 'Zagueiro', brazilian: true, skin: '#c68642', hairColor: '#111827', hairStyle: 'bald', beard: true, headband: false, captain: true, glasses: false, jersey: '#f8fafc', trim: '#16a34a' },
+          { id: 's9', name: 'Kevin Visão', nameEn: 'Kevin Vision', role: 'Meia', brazilian: false, skin: '#ffdbac', hairColor: '#b91c1c', hairStyle: 'short', beard: false, headband: false, captain: false, glasses: true, jersey: '#dc2626', trim: '#facc15' },
+          { id: 's10', name: 'Jude Estilo', nameEn: 'Jude Style', role: 'Meia', brazilian: false, skin: '#a46941', hairColor: '#111827', hairStyle: 'curly', beard: false, headband: false, captain: false, glasses: false, jersey: '#f8fafc', trim: '#1e3a8a' },
+          { id: 's11', name: 'Luka Veterano', nameEn: 'Luka Veteran', role: 'Meia', brazilian: false, skin: '#f1c27d', hairColor: '#d97706', hairStyle: 'long', beard: false, headband: true, captain: true, glasses: false, jersey: '#dc2626', trim: '#ffffff' },
+          { id: 's12', name: 'Edgar Óculos', nameEn: 'Edgar Goggles', role: 'Zagueiro', brazilian: false, skin: '#6f4e37', hairColor: '#111827', hairStyle: 'long', beard: true, headband: false, captain: false, glasses: true, jersey: '#f97316', trim: '#0f172a' }
+        ],
+        questions: [
+          { id: 'sq1', label: { pt: 'Tem barba?', en: 'Has a beard?' }, check: c => c.beard },
+          { id: 'sq2', label: { pt: 'Usa faixa na cabeça?', en: 'Wearing a headband?' }, check: c => c.headband },
+          { id: 'sq3', label: { pt: 'É capitão (braçadeira)?', en: 'Is team captain?' }, check: c => c.captain },
+          { id: 'sq4', label: { pt: 'Usa óculos esportivo?', en: 'Wearing sport glasses?' }, check: c => c.glasses },
+          { id: 'sq5', label: { pt: 'É atacante?', en: 'Is a forward?' }, check: c => c.role === 'Atacante' },
+          { id: 'sq6', label: { pt: 'É meio-campista?', en: 'Is a midfielder?' }, check: c => c.role === 'Meia' },
+          { id: 'sq7', label: { pt: 'É zagueiro ou goleiro?', en: 'Defender or goalkeeper?' }, check: c => c.role === 'Zagueiro' || c.role === 'Goleiro' },
+          { id: 'sq8', label: { pt: 'É brasileiro(a)?', en: 'Is Brazilian?' }, check: c => c.brazilian },
+          { id: 'sq9', label: { pt: 'Tem cabelo comprido?', en: 'Has long hair?' }, check: c => c.hairStyle === 'long' },
+          { id: 'sq10', label: { pt: 'É careca?', en: 'Is bald?' }, check: c => c.hairStyle === 'bald' },
+          { id: 'sq11', label: { pt: 'Veste camisa amarela?', en: 'Wearing yellow jersey?' }, check: c => c.jersey === '#facc15' },
+          { id: 'sq12', label: { pt: 'Veste camisa vermelha?', en: 'Wearing red jersey?' }, check: c => c.jersey === '#dc2626' }
+        ]
+      },
+      classic: {
+        characters: [
+          { id: 'c1', name: 'Arthur', nameEn: 'Arthur', gender: 'M', skin: '#f1c27d', hairColor: '#4a3728', hairStyle: 'short', beard: true, mustache: false, glasses: true, hat: false, jersey: '#2563eb', trim: '#93c5fd' },
+          { id: 'c2', name: 'Beatriz', nameEn: 'Beatrice', gender: 'F', skin: '#ffdbac', hairColor: '#b91c1c', hairStyle: 'long', beard: false, mustache: false, glasses: false, hat: true, jersey: '#ec4899', trim: '#fbcfe8' },
+          { id: 'c3', name: 'Carlos', nameEn: 'Charles', gender: 'M', skin: '#c68642', hairColor: '#111827', hairStyle: 'bald', beard: false, mustache: true, glasses: false, hat: false, jersey: '#16a34a', trim: '#86efac' },
+          { id: 'c4', name: 'Diana', nameEn: 'Diana', gender: 'F', skin: '#8d5524', hairColor: '#111827', hairStyle: 'curly', beard: false, mustache: false, glasses: true, hat: false, jersey: '#9333ea', trim: '#d8b4fe' },
+          { id: 'c5', name: 'Eduardo', nameEn: 'Edward', gender: 'M', skin: '#ffdbac', hairColor: '#eab308', hairStyle: 'short', beard: false, mustache: false, glasses: false, hat: true, jersey: '#f59e0b', trim: '#fef08a' },
+          { id: 'c6', name: 'Fernanda', nameEn: 'Fernanda', gender: 'F', skin: '#e0ac69', hairColor: '#f8fafc', hairStyle: 'long', beard: false, mustache: false, glasses: false, hat: false, jersey: '#0d9488', trim: '#99f6e4' },
+          { id: 'c7', name: 'Gustavo', nameEn: 'Gustav', gender: 'M', skin: '#6f4e37', hairColor: '#111827', hairStyle: 'curly', beard: true, mustache: true, glasses: false, hat: false, jersey: '#dc2626', trim: '#fca5a5' },
+          { id: 'c8', name: 'Helena', nameEn: 'Helen', gender: 'F', skin: '#f1c27d', hairColor: '#4a3728', hairStyle: 'short', beard: false, mustache: false, glasses: true, hat: true, jersey: '#3b82f6', trim: '#bfdbfe' },
+          { id: 'c9', name: 'Igor', nameEn: 'Igor', gender: 'M', skin: '#ffdbac', hairColor: '#f8fafc', hairStyle: 'bald', beard: true, mustache: false, glasses: true, hat: false, jersey: '#475569', trim: '#cbd5e1' },
+          { id: 'c10', name: 'Júlia', nameEn: 'Julia', gender: 'F', skin: '#a46941', hairColor: '#eab308', hairStyle: 'curly', beard: false, mustache: false, glasses: false, hat: false, jersey: '#f97316', trim: '#fed7aa' },
+          { id: 'c11', name: 'Lucas', nameEn: 'Luke', gender: 'M', skin: '#d99b66', hairColor: '#b91c1c', hairStyle: 'long', beard: false, mustache: true, glasses: false, hat: true, jersey: '#059669', trim: '#6ee7b7' },
+          { id: 'c12', name: 'Marina', nameEn: 'Marina', gender: 'F', skin: '#ffdbac', hairColor: '#111827', hairStyle: 'long', beard: false, mustache: false, glasses: true, hat: false, jersey: '#e11d48', trim: '#fda4af' }
+        ],
+        questions: [
+          { id: 'cq1', label: { pt: 'É mulher?', en: 'Is female?' }, check: c => c.gender === 'F' },
+          { id: 'cq2', label: { pt: 'Usa óculos?', en: 'Wearing glasses?' }, check: c => c.glasses },
+          { id: 'cq3', label: { pt: 'Usa chapéu?', en: 'Wearing a hat?' }, check: c => c.hat },
+          { id: 'cq4', label: { pt: 'Tem barba?', en: 'Has a beard?' }, check: c => c.beard },
+          { id: 'cq5', label: { pt: 'Tem bigode?', en: 'Has a mustache?' }, check: c => c.mustache },
+          { id: 'cq6', label: { pt: 'Tem cabelo comprido?', en: 'Has long hair?' }, check: c => c.hairStyle === 'long' },
+          { id: 'cq7', label: { pt: 'Tem cabelo cacheado?', en: 'Has curly hair?' }, check: c => c.hairStyle === 'curly' },
+          { id: 'cq8', label: { pt: 'É careca?', en: 'Is bald?' }, check: c => c.hairStyle === 'bald' },
+          { id: 'cq9', label: { pt: 'Tem cabelo loiro?', en: 'Has blonde hair?' }, check: c => c.hairColor === '#eab308' },
+          { id: 'cq10', label: { pt: 'Tem cabelo ruivo?', en: 'Has red hair?' }, check: c => c.hairColor === '#b91c1c' }
+        ]
+      }
+    };
+
+    function getCharDisplayName(char) {
+      return currentLang === 'en' && char.nameEn ? char.nameEn : char.name;
+    }
+
+    // =========================================================================
+    // 3. GERADOR DE AVATARES ILUSTRADOS EM SVG
+    // =========================================================================
+    function renderCharacterSVG(c) {
+      const hairBack = c.hairStyle === 'long'
+        ? `<path d="M24 42 Q20 76 28 86 L72 86 Q80 76 76 42 Z" fill="${c.hairColor}" />`
+        : '';
+
+      let hairFront = '';
+      if (c.hairStyle === 'short') {
+        hairFront = `<path d="M27 42 C27 20, 73 20, 73 42 C68 30, 32 30, 27 42 Z" fill="${c.hairColor}" />`;
+      } else if (c.hairStyle === 'curly') {
+        hairFront = `
+          <circle cx="30" cy="30" r="9" fill="${c.hairColor}" />
+          <circle cx="42" cy="24" r="10" fill="${c.hairColor}" />
+          <circle cx="58" cy="24" r="10" fill="${c.hairColor}" />
+          <circle cx="70" cy="30" r="9" fill="${c.hairColor}" />
+          <circle cx="26" cy="40" r="7" fill="${c.hairColor}" />
+          <circle cx="74" cy="40" r="7" fill="${c.hairColor}" />
+        `;
+      } else if (c.hairStyle === 'long') {
+        hairFront = `<path d="M26 42 C26 19, 74 19, 74 42 C66 28, 34 28, 26 42 Z" fill="${c.hairColor}" />`;
+      }
+
+      const headbandSVG = c.headband
+        ? `<rect x="27" y="34" width="46" height="5" rx="2.5" fill="#ffffff" stroke="#0f172a" stroke-width="1" />`
+        : '';
+
+      const hatSVG = c.hat
+        ? `
+          <ellipse cx="50" cy="26" rx="34" ry="6" fill="#334155" />
+          <path d="M32 26 L36 11 L64 11 L68 26 Z" fill="#475569" />
+          <rect x="33" y="21" width="34" height="4" fill="#f59e0b" />
+        `
+        : '';
+
+      const beardSVG = c.beard
+        ? `<path d="M31 53 Q31 74 50 75 Q69 74 69 53 Q62 61 50 61 Q38 61 31 53 Z" fill="${c.hairColor}" opacity="0.92" />`
+        : '';
+
+      const mustacheSVG = (c.mustache && !c.beard)
+        ? `<path d="M39 56 Q50 51 61 56 Q56 60 50 58 Q44 60 39 56 Z" fill="${c.hairColor}" />`
+        : '';
+
+      const glassesSVG = c.glasses
+        ? `
+          <rect x="33" y="42" width="14" height="10" rx="3" fill="rgba(255,255,255,0.22)" stroke="#0f172a" stroke-width="2.2" />
+          <rect x="53" y="42" width="14" height="10" rx="3" fill="rgba(255,255,255,0.22)" stroke="#0f172a" stroke-width="2.2" />
+          <line x1="47" y1="47" x2="53" y2="47" stroke="#0f172a" stroke-width="2.2" />
+        `
+        : '';
+
+      const captainSVG = c.captain
+        ? `<rect x="72" y="84" width="11" height="6" rx="1.5" fill="#facc15" stroke="#0f172a" stroke-width="1" /><text x="77.5" y="88.5" font-size="4.5" font-weight="bold" text-anchor="middle" fill="#0f172a">C</text>`
+        : '';
+
+      return `
+        <svg viewBox="0 0 100 105" class="w-full h-full object-cover bg-gradient-to-b from-slate-700/60 to-slate-900">
+          ${hairBack}
+          <rect x="42" y="66" width="16" height="14" rx="4" fill="${c.skin}" />
+          <path d="M16 105 C16 82, 32 76, 50 76 C68 76, 84 82, 84 105 Z" fill="${c.jersey}" />
+          <path d="M38 77 L50 88 L62 77" fill="none" stroke="${c.trim}" stroke-width="3" />
+          ${captainSVG}
+          <rect x="29" y="25" width="42" height="47" rx="20" fill="${c.skin}" />
+          <circle cx="28" cy="48" r="4.5" fill="${c.skin}" />
+          <circle cx="72" cy="48" r="4.5" fill="${c.skin}" />
+          <circle cx="40" cy="47" r="2.7" fill="#0f172a" />
+          <circle cx="60" cy="47" r="2.7" fill="#0f172a" />
+          <path d="M43 60 Q50 65 57 60" fill="none" stroke="#7c2d12" stroke-width="2.2" stroke-linecap="round" />
+          ${beardSVG}
+          ${mustacheSVG}
+          ${hairFront}
+          ${headbandSVG}
+          ${glassesSVG}
+          ${hatSVG}
+        </svg>
+      `;
+    }
+
+    // =========================================================================
+    // 4. ESTADO GLOBAL DA PARTIDA E MULTIPLAYER ONLINE (PeerJS + Broadcast)
+    // =========================================================================
+    const state = {
+      theme: 'soccer',
+      mode: 'cpu',
+      roomCode: null,
+      playerRole: 1,
+      activePlayer: 1,
+      scores: { p1: 0, p2: 0 },
+      turn: 1,
+      isMyTurn: true,
+      finalGuessMode: false,
+      lastQuestionObj: null,
+      lastAnswerBool: null,
+      pendingQuestionText: null,
+      players: {
+        1: { secret: null, eliminated: new Set() },
+        2: { secret: null, eliminated: new Set() }
+      },
+      cpuCandidates: new Set()
+    };
+
+    let syncChannel = null;
+    let peerInstance = null;
+    let peerConn = null;
+    let lastProcessedEventId = null;
+
+    function getShareableRoomUrl(code) {
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set('room', code);
+        return url.toString();
+      } catch (e) {
+        return `${window.location.origin}${window.location.pathname}?room=${code}`;
+      }
+    }
+
+    function setupSyncChannel(roomCode) {
+      if (syncChannel) syncChannel.close();
+      if (peerInstance) {
+        try { peerInstance.destroy(); } catch (e) {}
+        peerInstance = null;
+        peerConn = null;
+      }
+
+      if ('BroadcastChannel' in window) {
+        syncChannel = new BroadcastChannel(`cara_a_cara_${roomCode}`);
+        syncChannel.onmessage = (event) => {
+          handleRemoteEvent(event.data);
+        };
+      }
+
+      if (typeof window.Peer !== 'undefined') {
+        try {
+          const peerId = state.playerRole === 1
+            ? `cara-a-cara-room-${roomCode}-p1`
+            : `cara-a-cara-room-${roomCode}-p2-${Math.random().toString(36).slice(2, 6)}`;
+
+          peerInstance = new window.Peer(peerId);
+
+          peerInstance.on('open', () => {
+            if (state.playerRole === 2) {
+              const conn = peerInstance.connect(`cara-a-cara-room-${roomCode}-p1`, { reliable: true });
+              peerConn = conn;
+              conn.on('open', () => {
+                sendSyncEvent({ type: 'JOIN_REQUEST' });
+              });
+              conn.on('data', (data) => handleRemoteEvent(data));
+            }
+          });
+
+          peerInstance.on('connection', (conn) => {
+            peerConn = conn;
+            conn.on('data', (data) => handleRemoteEvent(data));
+          });
+        } catch (e) {}
+      }
+    }
+
+    function sendSyncEvent(payload) {
+      if (state.mode !== 'online' || !state.roomCode) return;
+      const eventObj = {
+        ...payload,
+        sender: state.playerRole,
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 7)}`
+      };
+      lastProcessedEventId = eventObj.id;
+
+      if (syncChannel) {
+        syncChannel.postMessage(eventObj);
+      }
+      if (peerConn && peerConn.open) {
+        peerConn.send(eventObj);
+      }
+    }
+
+    function handleRemoteEvent(data) {
+      if (!data || data.sender === state.playerRole) return;
+      if (data.id && data.id === lastProcessedEventId) return;
+      if (data.id) lastProcessedEventId = data.id;
+
+      if (data.type === 'JOIN_REQUEST' && state.playerRole === 1) {
+        if (state.players[1].secret && state.players[2].secret) {
+          sendSyncEvent({
+            type: 'ROOM_SYNC_START',
+            theme: state.theme,
+            p1SecretId: state.players[1].secret.id,
+            p2SecretId: state.players[2].secret.id
+          });
+        }
+        appendChat(t('systemLabel'), t('sysP2Joined'), 'system');
+      } else if (data.type === 'ROOM_SYNC_START' && state.playerRole === 2) {
+        state.theme = data.theme;
+        const deck = DECKS[state.theme].characters;
+        state.players[1].secret = deck.find(c => c.id === data.p1SecretId);
+        state.players[2].secret = deck.find(c => c.id === data.p2SecretId);
+        state.isMyTurn = false;
+        launchGameUI();
+        appendChat(t('systemLabel'), t('sysConnectedWait'), 'system');
+      } else if (data.type === 'ASK_QUESTION') {
+        playSound('ask');
+        state.pendingQuestionText = data.questionText;
+        appendChat(t('rivalLabel'), data.questionText, 'rival');
+        showIncomingQuestionBox(data.questionText);
+      } else if (data.type === 'ANSWER_QUESTION') {
+        playSound(data.answer ? 'yes' : 'no');
+        const ansText = data.answer ? t('yesText') : t('noText');
+        appendChat(t('rivalLabel'), ansText, 'rival');
+        state.lastAnswerBool = data.answer;
+        if (state.lastQuestionObj) {
+          document.getElementById('autoFilterBtn').disabled = false;
+        }
+        state.isMyTurn = false;
+        updateTurnUI();
+      } else if (data.type === 'GAME_OVER') {
+        finishMatch(data.winnerRole === state.playerRole, data.reason);
+      }
+    }
+
+    // =========================================================================
+    // 5. CONTROLES DA TELA INICIAL (TEMA, MODO E SALA ONLINE)
+    // =========================================================================
+    window.selectTheme = function (themeKey) {
+      state.theme = themeKey;
+      document.getElementById('themeSoccerBtn').className = themeKey === 'soccer'
+        ? 'theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-left transition active:scale-98'
+        : 'theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition active:scale-98';
+
+      document.getElementById('themeClassicBtn').className = themeKey === 'classic'
+        ? 'theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-left transition active:scale-98'
+        : 'theme-btn flex items-center gap-3.5 p-4 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition active:scale-98';
+    };
+
+    window.selectMode = function (modeKey) {
+      state.mode = modeKey;
+      ['cpu', 'pass', 'online'].forEach(m => {
+        const btn = document.getElementById(`mode${m.charAt(0).toUpperCase() + m.slice(1)}Btn`);
+        btn.className = m === modeKey
+          ? 'mode-btn p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-500/10 text-left transition'
+          : 'mode-btn p-3.5 rounded-2xl border-2 border-slate-800 bg-slate-950/60 hover:border-slate-700 text-left transition';
+      });
+
+      const onlinePanel = document.getElementById('onlineRoomPanel');
+      const mainStartBtn = document.getElementById('mainStartBtn');
+      if (modeKey === 'online') {
+        onlinePanel.classList.remove('hidden');
+        mainStartBtn.classList.add('hidden');
+      } else {
+        onlinePanel.classList.add('hidden');
+        mainStartBtn.classList.remove('hidden');
+      }
+    };
+
+    window.createOnlineRoom = function () {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      state.roomCode = code;
+      state.playerRole = 1;
+      document.getElementById('generatedRoomCode').textContent = code;
+      document.getElementById('createdRoomBox').classList.remove('hidden');
+      setupSyncChannel(code);
+    };
+
+    window.copyRoomCode = function () {
+      const code = state.roomCode;
+      if (!code) return;
+      const shareUrl = getShareableRoomUrl(code);
+      const tempInput = document.createElement('input');
+      tempInput.value = `${shareUrl} (${code})`;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      const status = document.getElementById('onlineStatusMsg');
+      status.textContent = t('copiedCodeMsg', code);
+      status.classList.remove('hidden');
+    };
+
+    window.inviteViaWhatsApp = function () {
+      const code = state.roomCode;
+      if (!code) return;
+      const shareUrl = getShareableRoomUrl(code);
+      const text = encodeURIComponent(t('whatsappText', code, shareUrl));
+      window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
+    };
+
+    window.joinOnlineRoom = function () {
+      const code = document.getElementById('joinRoomInput').value.trim().toUpperCase();
+      const status = document.getElementById('onlineStatusMsg');
+      if (code.length < 4) {
+        status.textContent = t('invalidRoomCode');
+        status.classList.remove('hidden');
+        return;
+      }
+      state.roomCode = code;
+      state.playerRole = 2;
+      setupSyncChannel(code);
+      window.startGame(true);
+
+      setTimeout(() => {
+        sendSyncEvent({ type: 'JOIN_REQUEST' });
+      }, 300);
+    };
+
+    // =========================================================================
+    // 6. INICIALIZAÇÃO E RENDERIZAÇÃO DO TABULEIRO
+    // =========================================================================
+    window.startGame = function (isJoiningOnline = false) {
+      initAudio();
+      const deck = DECKS[state.theme].characters;
+      const shuffled = [...deck].sort(() => Math.random() - 0.5);
+
+      state.players[1] = { secret: shuffled[0], eliminated: new Set() };
+      state.players[2] = { secret: shuffled[1], eliminated: new Set() };
+      state.cpuCandidates = new Set(deck.map(c => c.id));
+
+      state.turn = 1;
+      state.activePlayer = 1;
+      state.finalGuessMode = false;
+      state.lastQuestionObj = null;
+      state.lastAnswerBool = null;
+
+      if (state.mode === 'online') {
+        state.isMyTurn = (state.playerRole === 1);
+      } else {
+        state.isMyTurn = true;
+      }
+
+      launchGameUI();
+
+      if (state.mode === 'pass') {
+        showPassModal(t('passP1Title'), t('passP1Desc'));
+      } else if (state.mode === 'online' && !isJoiningOnline) {
+        appendChat(t('systemLabel'), t('sysRoomCreated', state.roomCode), 'system');
+      } else if (state.mode === 'cpu') {
+        appendChat(t('systemLabel'), t('sysCpuStart'), 'system');
+      }
+    };
+
+    function launchGameUI() {
+      document.getElementById('setupScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      document.getElementById('menuReturnBtn').classList.remove('hidden');
+      document.getElementById('scoreBadge').classList.remove('hidden');
+      document.getElementById('scoreBadge').classList.add('flex');
+
+      const roomBadge = document.getElementById('roomTagBadge');
+      if (state.mode === 'online' && state.roomCode) {
+        roomBadge.textContent = t('roomTag', state.roomCode, state.playerRole);
+        roomBadge.classList.remove('hidden');
+      } else {
+        roomBadge.classList.add('hidden');
+      }
+
+      document.getElementById('chatLog').innerHTML = '';
+      renderSecretCard();
+      renderBoard();
+      renderQuickQuestions();
+      updateTurnUI();
+      updateScoreDisplay();
+    }
+
+    function getCurrentPlayerObj() {
+      if (state.mode === 'online') return state.players[state.playerRole];
+      if (state.mode === 'pass') return state.players[state.activePlayer];
+      return state.players[1];
+    }
+
+    function getOpponentPlayerObj() {
+      if (state.mode === 'online') return state.players[state.playerRole === 1 ? 2 : 1];
+      if (state.mode === 'pass') return state.players[state.activePlayer === 1 ? 2 : 1];
+      return state.players[2];
+    }
+
+    function renderSecretCard() {
+      const me = getCurrentPlayerObj();
+      const s = me.secret;
+      if (!s) return;
+      document.getElementById('mySecretAvatar').innerHTML = renderCharacterSVG(s);
+      document.getElementById('mySecretName').textContent = getCharDisplayName(s);
+
+      const rawTraits = [];
+      if (state.theme === 'soccer') {
+        rawTraits.push(s.role);
+        rawTraits.push(s.brazilian ? 'Brasil' : 'Internacional');
+        if (s.beard) rawTraits.push('Barba');
+        if (s.headband) rawTraits.push('Faixa');
+        if (s.captain) rawTraits.push('Capitão');
+        if (s.glasses) rawTraits.push('Óculos');
+      } else {
+        rawTraits.push(s.gender === 'F' ? 'Mulher' : 'Homem');
+        if (s.glasses) rawTraits.push('Óculos');
+        if (s.hat) rawTraits.push('Chapéu');
+        if (s.beard) rawTraits.push('Barba');
+        if (s.mustache) rawTraits.push('Bigode');
+      }
+      const localizedTraits = currentLang === 'en'
+        ? rawTraits.map(tr => I18N.en.traits[tr] || tr)
+        : rawTraits;
+      document.getElementById('mySecretTraitsText').textContent = localizedTraits.join(' • ');
+    }
+
+    function renderBoard() {
+      const grid = document.getElementById('cardsGrid');
+      const deck = DECKS[state.theme].characters;
+      const me = getCurrentPlayerObj();
+      const shortMap = currentLang === 'en' ? I18N.en.roleShortEn : I18N.pt.roleShort;
+
+      grid.innerHTML = deck.map(char => {
+        const isFlipped = me.eliminated.has(char.id);
+        const displayName = getCharDisplayName(char);
+        return `
+          <div onclick="window.handleCardClick('${char.id}')"
+            id="card-${char.id}"
+            class="perspective-1000 aspect-[3/4] cursor-pointer group ${isFlipped ? 'card-flipped' : ''} ${state.finalGuessMode ? 'guess-mode-card' : ''}">
+            <div class="card-inner">
+              <!-- FRENTE DA CARTA -->
+              <div class="card-face bg-slate-800 border-2 border-slate-700 group-hover:border-emerald-400 flex flex-col shadow-md transition-colors">
+                <div class="flex-1 overflow-hidden relative">
+                  ${renderCharacterSVG(char)}
+                  ${state.theme === 'soccer' ? `<span class="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-slate-950/75 text-[9px] font-bold text-slate-200">${shortMap[char.role] || char.role.slice(0,3).toUpperCase()}</span>` : ''}
+                </div>
+                <div class="bg-slate-950/95 px-1.5 py-1 text-center border-t border-slate-800">
+                  <span class="block text-[11px] sm:text-xs font-bold text-white truncate">${displayName}</span>
+                </div>
+              </div>
+
+              <!-- VERSO DA CARTA (ELIMINADA) -->
+              <div class="card-face card-back flex flex-col items-center justify-center p-2 text-center">
+                <span class="text-xl sm:text-2xl opacity-40">✖️</span>
+                <span class="text-[10px] font-bold text-slate-500 line-through mt-1 truncate max-w-full">${displayName}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      updateRemainingCounter();
+    }
+
+    window.handleCardClick = function (charId) {
+      const me = getCurrentPlayerObj();
+
+      // Se estiver no modo Palpite Final, abre confirmação visual com a carta escolhida
+      if (state.finalGuessMode) {
+        if (me.eliminated.has(charId)) return;
+        const rival = getOpponentPlayerObj();
+        const guessedChar = DECKS[state.theme].characters.find(c => c.id === charId);
+        if (!guessedChar) return;
+        const guessedName = getCharDisplayName(guessedChar);
+        const rivalSecretName = getCharDisplayName(rival.secret);
+
+        const previewEl = document.getElementById('dialogPreviewCard');
+        previewEl.innerHTML = renderCharacterSVG(guessedChar);
+        previewEl.classList.remove('hidden');
+
+        document.getElementById('dialogTitle').textContent = t('guessConfirmTitle', guessedName);
+        document.getElementById('dialogText').textContent = t('guessConfirmText');
+        document.getElementById('dialogConfirmBtn').onclick = () => {
+          window.closeCustomDialog();
+          const isCorrect = (charId === rival.secret.id);
+
+          if (state.mode === 'online') {
+            sendSyncEvent({
+              type: 'GAME_OVER',
+              winnerRole: isCorrect ? state.playerRole : (state.playerRole === 1 ? 2 : 1),
+              reason: isCorrect
+                ? t('remoteGuessWin', state.playerRole, guessedName)
+                : t('remoteGuessLose', state.playerRole, guessedName)
+            });
+          }
+
+          const reasonText = isCorrect
+            ? t('guessCorrect', guessedName)
+            : t('guessWrong', guessedName, rivalSecretName);
+          finishMatch(isCorrect, reasonText);
+        };
+        document.getElementById('customDialogModal').classList.remove('hidden');
+        return;
+      }
+
+      // Modo normal: vira/desvira a carta para eliminar suspeito
+      playSound('flip');
+      const cardEl = document.getElementById(`card-${charId}`);
+      if (me.eliminated.has(charId)) {
+        me.eliminated.delete(charId);
+        cardEl?.classList.remove('card-flipped');
+      } else {
+        me.eliminated.add(charId);
+        cardEl?.classList.add('card-flipped');
+      }
+      updateRemainingCounter();
+    };
+
+    window.resetBoardCards = function () {
+      const me = getCurrentPlayerObj();
+      me.eliminated.clear();
+      playSound('flip');
+      renderBoard();
+    };
+
+    function updateRemainingCounter() {
+      const me = getCurrentPlayerObj();
+      const total = DECKS[state.theme].characters.length;
+      const remaining = total - me.eliminated.size;
+      document.getElementById('turnSubLabel').innerHTML = t('remainingSuspects', remaining);
+    }
+
+    // =========================================================================
+    // 7. PERGUNTAS, RESPOSTAS, AUTO-FILTRO E IA DO ROBÔ
+    // =========================================================================
+    function renderQuickQuestions() {
+      const container = document.getElementById('quickQuestionsList');
+      const questions = DECKS[state.theme].questions;
+      container.innerHTML = questions.map(q => `
+        <button type="button" onclick="window.askPredefinedQuestion('${q.id}')"
+          class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-emerald-600/25 border border-slate-700 hover:border-emerald-500/50 text-[11px] font-medium text-slate-200 transition active:scale-95">
+          ${q.label[currentLang]}
+        </button>
+      `).join('');
+    }
+
+    window.askPredefinedQuestion = function (qId) {
+      if (!state.isMyTurn) return;
+      const qObj = DECKS[state.theme].questions.find(q => q.id === qId);
+      if (!qObj) return;
+
+      state.lastQuestionObj = qObj;
+      state.lastAnswerBool = null;
+      document.getElementById('autoFilterBtn').disabled = true;
+
+      processOutgoingQuestion(qObj.label[currentLang], qObj);
+    };
+
+    window.handleCustomQuestion = function (e) {
+      e.preventDefault();
+      if (!state.isMyTurn) return;
+      const input = document.getElementById('customQuestionInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      state.lastQuestionObj = null;
+      state.lastAnswerBool = null;
+      document.getElementById('autoFilterBtn').disabled = true;
+
+      processOutgoingQuestion(text, null);
+    };
+
+    function processOutgoingQuestion(questionText, qObj) {
+      playSound('ask');
+      const senderLabel = state.mode === 'pass' ? t('playerLabel', state.activePlayer) : t('youLabel');
+      appendChat(senderLabel, questionText, 'me');
+
+      if (state.mode === 'cpu') {
+        state.isMyTurn = false;
+        updateTurnUI();
+
+        setTimeout(() => {
+          const rivalSecret = state.players[2].secret;
+          let answerBool = false;
+
+          if (qObj) {
+            answerBool = qObj.check(rivalSecret);
+          } else {
+            answerBool = evaluateFreeTextAgainstCharacter(questionText, rivalSecret);
+          }
+
+          playSound(answerBool ? 'yes' : 'no');
+          appendChat(t('cpuLabel'), answerBool ? t('yesText') : t('noText'), 'rival');
+
+          state.lastAnswerBool = answerBool;
+          if (qObj) {
+            document.getElementById('autoFilterBtn').disabled = false;
+          }
+
+          setTimeout(() => cpuTakeTurn(), 1100);
+        }, 750);
+
+      } else if (state.mode === 'pass') {
+        state.pendingQuestionText = questionText;
+        const prevPlayer = state.activePlayer;
+        state.activePlayer = state.activePlayer === 1 ? 2 : 1;
+        renderSecretCard();
+        renderBoard();
+        showPassModal(
+          t('passTurnTitle', state.activePlayer),
+          t('passTurnDesc', prevPlayer)
+        );
+        showIncomingQuestionBox(questionText);
+
+      } else if (state.mode === 'online') {
+        state.isMyTurn = false;
+        updateTurnUI();
+        sendSyncEvent({ type: 'ASK_QUESTION', questionText });
+      }
+    }
+
+    // Avaliador bilíngue de perguntas digitadas livremente contra o robô
+    function evaluateFreeTextAgainstCharacter(text, char) {
+      const q = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // Perguntas sobre cabelo (prioridade para não confundir com faixa ou chapéu)
+      if (q.includes('careca') || q.includes('raspado') || q.includes('bald')) return char.hairStyle === 'bald';
+      if (q.includes('tem cabelo') || q.includes('possui cabelo') || q.includes('has hair')) return char.hairStyle !== 'bald';
+      if (q.includes('comprido') || q.includes('longo') || q.includes('long hair')) return char.hairStyle === 'long';
+      if (q.includes('cacheado') || q.includes('curly') || q.includes('afro')) return char.hairStyle === 'curly';
+      if (q.includes('loiro') || q.includes('platinado') || q.includes('blonde')) return char.hairColor === '#eab308';
+      if (q.includes('ruivo') || q.includes('red hair') || q.includes('ginger')) return char.hairColor === '#b91c1c';
+      if (q.includes('branco') || q.includes('grisalho') || q.includes('white hair') || q.includes('gray')) return char.hairColor === '#f8fafc';
+
+      // Acessórios e rosto
+      if (q.includes('barba') || q.includes('beard')) return !!char.beard;
+      if (q.includes('bigode') || q.includes('mustache')) return !!char.mustache;
+      if (q.includes('oculos') || q.includes('glasses') || q.includes('goggles')) return !!char.glasses;
+      if (q.includes('faixa') || q.includes('tiara') || q.includes('headband')) return !!char.headband;
+      if (q.includes('chapeu') || q.includes('bone') || q.includes('hat') || q.includes('cap')) return !!char.hat;
+      if (q.includes('capitao') || q.includes('bracadeira') || q.includes('captain')) return !!char.captain;
+
+      // Posições, nacionalidade e gênero
+      if (q.includes('atacante') || q.includes('forward') || q.includes('striker')) return char.role === 'Atacante';
+      if (q.includes('meia') || q.includes('meio') || q.includes('midfielder')) return char.role === 'Meia';
+      if (q.includes('zagueiro') || q.includes('goleiro') || q.includes('defensor') || q.includes('defender') || q.includes('goalkeeper')) return char.role === 'Zagueiro' || char.role === 'Goleiro';
+      if (q.includes('brasil') || q.includes('brazil')) return !!char.brazilian;
+      if (q.includes('mulher') || q.includes('feminino') || q.includes('female') || q.includes('woman')) return char.gender === 'F';
+
+      // Cores de camisa
+      if (q.includes('amarel') || q.includes('yellow')) return char.jersey === '#facc15';
+      if (q.includes('azul') || q.includes('blue')) return char.jersey === '#2563eb' || char.jersey === '#38bdf8';
+      if (q.includes('vermelh') || q.includes('red')) return char.jersey === '#dc2626';
+      if (q.includes('verd') || q.includes('green')) return char.jersey === '#16a34a';
+      if (q.includes('branc') || q.includes('white')) return char.jersey === '#f8fafc';
+      return Math.random() > 0.5;
+    }
+
+    window.autoFilterLastAnswer = function () {
+      if (!state.lastQuestionObj || state.lastAnswerBool === null) return;
+      const me = getCurrentPlayerObj();
+      const deck = DECKS[state.theme].characters;
+      let newlyEliminated = 0;
+
+      deck.forEach(char => {
+        const matches = state.lastQuestionObj.check(char);
+        if (matches !== state.lastAnswerBool && !me.eliminated.has(char.id)) {
+          me.eliminated.add(char.id);
+          newlyEliminated++;
+        }
+      });
+
+      playSound('flip');
+      renderBoard();
+      document.getElementById('autoFilterBtn').disabled = true;
+      appendChat(t('systemLabel'), t('sysAutoFiltered', newlyEliminated), 'system');
+    };
+
+    function cpuTakeTurn() {
+      const deck = DECKS[state.theme].characters;
+      const questions = DECKS[state.theme].questions;
+      const p1Secret = state.players[1].secret;
+
+      if (state.cpuCandidates.size <= 2) {
+        const guessId = Array.from(state.cpuCandidates)[0];
+        const guessedChar = deck.find(c => c.id === guessId);
+        const guessedName = getCharDisplayName(guessedChar);
+        const cpuWon = (guessId === p1Secret.id);
+        finishMatch(
+          !cpuWon,
+          cpuWon
+            ? t('cpuGuessWin', guessedName)
+            : t('cpuGuessLose', guessedName)
+        );
+        return;
+      }
+
+      let bestQ = questions[Math.floor(Math.random() * questions.length)];
+      let bestScore = Infinity;
+
+      questions.forEach(q => {
+        let yesCount = 0;
+        state.cpuCandidates.forEach(id => {
+          const c = deck.find(item => item.id === id);
+          if (c && q.check(c)) yesCount++;
+        });
+        const diff = Math.abs(yesCount - (state.cpuCandidates.size / 2));
+        if (diff < bestScore && yesCount > 0 && yesCount < state.cpuCandidates.size) {
+          bestScore = diff;
+          bestQ = q;
+        }
+      });
+
+      const answerBool = bestQ.check(p1Secret);
+      playSound('ask');
+      appendChat(t('cpuLabel'), t('cpuTurnAsk', bestQ.label[currentLang]), 'rival');
+
+      setTimeout(() => {
+        playSound(answerBool ? 'yes' : 'no');
+        appendChat(t('youAutoLabel'), answerBool ? t('yesBtn') : t('noBtn'), 'me');
+
+        state.cpuCandidates.forEach(id => {
+          const c = deck.find(item => item.id === id);
+          if (c && bestQ.check(c) !== answerBool) {
+            state.cpuCandidates.delete(id);
+          }
+        });
+
+        state.turn++;
+        state.isMyTurn = true;
+        updateTurnUI();
+      }, 900);
+    }
+
+    function showIncomingQuestionBox(qText) {
+      document.getElementById('incomingQuestionText').textContent = t('incomingQuestion', qText);
+      document.getElementById('answerActionBox').classList.remove('hidden');
+      document.getElementById('askControlsBox').classList.add('hidden');
+    }
+
+    window.answerOpponentQuestion = function (answerBool) {
+      playSound(answerBool ? 'yes' : 'no');
+      document.getElementById('answerActionBox').classList.add('hidden');
+      document.getElementById('askControlsBox').classList.remove('hidden');
+
+      const ansText = answerBool ? t('yesText') : t('noText');
+      const who = state.mode === 'pass' ? t('playerLabel', state.activePlayer) : t('youLabel');
+      appendChat(who, ansText, 'me');
+
+      if (state.mode === 'online') {
+        sendSyncEvent({ type: 'ANSWER_QUESTION', answer: answerBool });
+        state.turn++;
+        state.isMyTurn = true;
+        updateTurnUI();
+      } else if (state.mode === 'pass') {
+        state.turn++;
+        state.isMyTurn = true;
+        updateTurnUI();
+      }
+    };
+
+    // =========================================================================
+    // 8. PALPITE FINAL, MODAIS E RESULTADO
+    // =========================================================================
+    window.toggleFinalGuessMode = function () {
+      if (!state.isMyTurn && state.mode !== 'pass') return;
+      state.finalGuessMode = !state.finalGuessMode;
+      const banner = document.getElementById('finalGuessBanner');
+      if (state.finalGuessMode) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+      renderBoard();
+    };
+
+    function finishMatch(didWin, message) {
+      state.finalGuessMode = false;
+      document.getElementById('finalGuessBanner').classList.add('hidden');
+
+      if (didWin) {
+        if (state.mode === 'pass' && state.activePlayer === 2) {
+          state.scores.p2++;
+        } else {
+          state.scores.p1++;
+        }
+        playSound('win');
+        document.getElementById('resultIcon').textContent = '🏆';
+        document.getElementById('resultTitle').textContent = t('winTitle');
+        document.getElementById('resultTitle').className = 'font-display text-3xl font-bold text-emerald-400';
+      } else {
+        if (state.mode === 'pass' && state.activePlayer === 2) {
+          state.scores.p1++;
+        } else {
+          state.scores.p2++;
+        }
+        playSound('lose');
+        document.getElementById('resultIcon').textContent = '💔';
+        document.getElementById('resultTitle').textContent = t('loseTitle');
+        document.getElementById('resultTitle').className = 'font-display text-3xl font-bold text-rose-400';
+      }
+
+      updateScoreDisplay();
+
+      const me = getCurrentPlayerObj();
+      const rival = getOpponentPlayerObj();
+
+      document.getElementById('resultMessage').textContent = message;
+      document.getElementById('revealMyCard').innerHTML = renderCharacterSVG(me.secret);
+      document.getElementById('revealMyName').textContent = getCharDisplayName(me.secret);
+      document.getElementById('revealRivalCard').innerHTML = renderCharacterSVG(rival.secret);
+      document.getElementById('revealRivalName').textContent = getCharDisplayName(rival.secret);
+
+      document.getElementById('resultModal').classList.remove('hidden');
+    }
+
+    window.playAgain = function () {
+      document.getElementById('resultModal').classList.add('hidden');
+      window.startGame();
+    };
+
+    window.backToMenu = function () {
+      document.getElementById('resultModal').classList.add('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('menuReturnBtn').classList.add('hidden');
+      document.getElementById('setupScreen').classList.remove('hidden');
+    };
+
+    window.confirmReturnMenu = function () {
+      document.getElementById('dialogPreviewCard').classList.add('hidden');
+      document.getElementById('dialogTitle').textContent = t('exitDialogTitle');
+      document.getElementById('dialogText').textContent = t('exitDialogText');
+      document.getElementById('dialogConfirmBtn').onclick = () => {
+        window.closeCustomDialog();
+        window.backToMenu();
+      };
+      document.getElementById('customDialogModal').classList.remove('hidden');
+    };
+
+    window.closeCustomDialog = function () {
+      document.getElementById('dialogPreviewCard').classList.add('hidden');
+      document.getElementById('customDialogModal').classList.add('hidden');
+    };
+
+    function showPassModal(title, desc) {
+      document.getElementById('passModalTitle').textContent = title;
+      document.getElementById('passModalDesc').textContent = desc;
+      document.getElementById('passDeviceModal').classList.remove('hidden');
+    }
+
+    window.confirmPassDevice = function () {
+      document.getElementById('passDeviceModal').classList.add('hidden');
+      updateTurnUI();
+    };
+
+    // =========================================================================
+    // 9. ATUALIZAÇÃO DE INTERFACE E CHAT
+    // =========================================================================
+    function updateTurnUI() {
+      const turnLabel = document.getElementById('turnLabel');
+      const dot = document.getElementById('turnIndicatorDot');
+      const askBox = document.getElementById('askControlsBox');
+
+      document.getElementById('turnCountBadge').textContent = t('roundBadge', state.turn);
+
+      if (state.mode === 'pass') {
+        turnLabel.textContent = t('playerTurn', state.activePlayer);
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping';
+      } else if (state.isMyTurn) {
+        turnLabel.textContent = t('yourTurn');
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping';
+        askBox.classList.remove('opacity-50', 'pointer-events-none');
+      } else {
+        turnLabel.textContent = state.mode === 'cpu' ? t('cpuThinking') : t('waitingRival');
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse';
+        askBox.classList.add('opacity-50', 'pointer-events-none');
+      }
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('p1ScoreLabel').textContent = state.mode === 'pass'
+        ? t('p1Score', state.scores.p1)
+        : t('youScore', state.scores.p1);
+      document.getElementById('p2ScoreLabel').textContent = state.mode === 'pass'
+        ? t('p2Score', state.scores.p2)
+        : t('rivalScore', state.scores.p2);
+    }
+
+    function appendChat(sender, text, type) {
+      const log = document.getElementById('chatLog');
+      const item = document.createElement('div');
+
+      if (type === 'system') {
+        item.className = 'bg-slate-800/70 text-slate-300 px-2.5 py-1.5 rounded-lg text-[11px] text-center';
+        item.textContent = text;
+      } else if (type === 'me') {
+        item.className = 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-100 px-3 py-2 rounded-xl ml-4';
+        item.innerHTML = `<span class="block text-[10px] font-bold text-emerald-400 mb-0.5">${sender}</span>${escapeHTML(text)}`;
+      } else {
+        item.className = 'bg-slate-800 border border-slate-700 text-slate-100 px-3 py-2 rounded-xl mr-4';
+        item.innerHTML = `<span class="block text-[10px] font-bold text-amber-400 mb-0.5">${sender}</span>${escapeHTML(text)}`;
+      }
+
+      log.appendChild(item);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag]));
+    }
+
+    // Inicializa PWA manifest, esconde botão de download no site publicado e aplica idioma
+    (function boot() {
+      setupInlinePWAManifest();
+      window.setLanguage(currentLang);
+
+      // Esconde o botão "💾 Baixar" quando já estiver hospedado no GitHub Pages / Vercel
+      const host = window.location.hostname || '';
+      if (host.includes('github.io') || host.includes('vercel.app') || host.includes('netlify.app')) {
+        const dlBtn = document.getElementById('downloadHtmlBtn');
+        if (dlBtn) dlBtn.classList.add('hidden');
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const invitedRoom = params.get('room');
+      if (invitedRoom) {
+        window.selectMode('online');
+        document.getElementById('joinRoomInput').value = invitedRoom.toUpperCase();
+        window.joinOnlineRoom();
+      }
+    })();
+  </script>
+
+</body></html>
